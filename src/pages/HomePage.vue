@@ -1,37 +1,45 @@
 <script setup>
+import { computed, onMounted } from 'vue';
+import { AppState } from '../AppState.js';
+import { blogsService } from '../services/BlogsService.js';
+import Pop from '../utils/Pop.js';
 
+
+    const blogs = computed(() => AppState.blogs)
+
+    async function loadBlogs() {
+      try {
+        await blogsService.loadBlogs()
+      }
+      catch (error){
+        Pop.error(error);
+      }
+    }
+
+    onMounted(() => loadBlogs())
 </script>
 
 <template>
-  <div class="home flex-grow-1 d-flex flex-column align-items-center justify-content-center">
-    <div class="home-card p-5 card align-items-center shadow rounded elevation-3">
-      <img src="https://bcw.blob.core.windows.net/public/img/8600856373152463" alt="CodeWorks Logo"
-        class="rounded-circle">
-      <h1 class="my-5 bg-dark text-white p-3 rounded text-center">
-        Vue 3 Starter
-      </h1>
+  <div class="container">
+    <div class="row mt-5 justify-content-center">
+      <div class="col-6 text-center">
+        <h2>Recent Stories</h2>
+        <button v-if="AppState.account" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-warning">Publish a Story</button>
+      </div>
+    </div>
+    <div class="row mt-3 justify-content-center">
+      <div class="col-xl-5 col-lg-6 col-md-10">
+        <div class="row">
+          <div v-for="blog in blogs" :key="blog.id" class="col-md-12 col-6 my-2">
+            <BlogCard :blog="blog"/>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
+  <StoryModal/>
 </template>
 
 <style scoped lang="scss">
-.home {
-  display: grid;
-  height: 80vh;
-  place-content: center;
-  text-align: center;
-  user-select: none;
 
-  .home-card {
-    width: clamp(500px, 50vw, 100%);
-
-    >img {
-      height: 200px;
-      max-width: 200px;
-      width: 100%;
-      object-fit: contain;
-      object-position: center;
-    }
-  }
-}
 </style>
